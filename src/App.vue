@@ -13,7 +13,7 @@
 import HeaderComp from "./components/HeaderComp";
 import TasksAll from "./components/TasksAll.vue";
 import "@fortawesome/fontawesome-free/js/all.js";
-import "bootstrap/dist/js";
+import "bootstrap";
 
 export default {
   name: "App",
