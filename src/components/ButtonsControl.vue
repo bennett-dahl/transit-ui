@@ -4,7 +4,6 @@
       <button
         :class="{ pressed: light.state }"
         :id="light.id"
-        :ref="light.id"
         v-on:click="toggle(light.id)"
         class="btn"
       >
