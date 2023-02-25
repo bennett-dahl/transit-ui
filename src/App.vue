@@ -1,31 +1,36 @@
 <template>
   <div class="container">
-    <HeaderComp title="Task Tracker" />
-    <TasksAll
+    <HeaderComp title="Transit Control" />
+    <!-- <TasksAll
       @toggle-reminder="toggleReminder"
       @delete-task="deleteTask"
       :tasks="tasks"
-    />
+    /> -->
+    <ButtonsControl :lights="lights" @toggle="toggle" />
   </div>
 </template>
 
 <script>
 import HeaderComp from "./components/HeaderComp";
-import TasksAll from "./components/TasksAll.vue";
+//import TasksAll from "./components/TasksAll.vue";
 import "@fortawesome/fontawesome-free/js/all.js";
 import "bootstrap";
+import ButtonsControl from "./components/ButtonsControl.vue";
 
 export default {
   name: "App",
   components: {
     HeaderComp,
-    TasksAll,
+    ButtonsControl,
   },
   data() {
     return {
+      socket: require("socket.io-client")("http://192.168.50.13:3000"),
+      lights: [],
       tasks: [],
     };
   },
+
   methods: {
     deleteTask(id) {
       if (
@@ -53,6 +58,9 @@ export default {
       //   t.id === task.id ? { ...t, reminder: !task.reminder } : t;
       // });
     },
+    toggle(val) {
+      this.socket.emit("lightToggle", val);
+    },
   },
   created() {
     this.tasks = [
@@ -75,6 +83,19 @@ export default {
         reminder: false,
       },
     ];
+    this.socket.on("init", (data) => {
+      this.response = data;
+      this.lights = data.lights;
+      console.log(this.lights);
+      //this.power_data = data.power_data;
+    });
+    this.socket.on("lightToggle", (data) => {
+      this.lights.forEach((el) => {
+        if (el.id == data.id) {
+          el.state = data.state;
+        }
+      });
+    });
   },
 };
 </script>
