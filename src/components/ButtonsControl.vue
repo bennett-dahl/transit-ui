@@ -1,13 +1,13 @@
 <template>
   <div>
-    <p v-for="light in lights" :key="light.id">
+    <p v-for="relay in relays" :key="relay.id">
       <button
-        :class="{ pressed: light.state }"
-        :id="light.id"
-        v-on:click="toggle(light.id)"
+        :class="{ pressed: relay.state }"
+        :id="relay.id"
+        v-on:click="toggle(relay.id)"
         class="btn"
       >
-        {{ light.name }}
+        {{ relay.name }}
       </button>
     </p>
     <!-- <input :id="val.id" v-on:click="log(val.id)" type="button" value= val.name> -->
@@ -18,7 +18,7 @@
 //import io from "socket.io-client";
 export default {
   name: "ButtonsControl",
-  props: { lights: Array },
+  props: { relays: Array },
   // data() {
   //   return {
   //     // socket: {},

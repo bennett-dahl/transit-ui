@@ -1,12 +1,12 @@
 <template>
   <div class="container">
-    <HeaderComp title="Transit Control" />
+    <HeaderComp @toggleOverhead="toggleOverhead" title="Transit Control" />
     <!-- <TasksAll
       @toggle-reminder="toggleReminder"
       @delete-task="deleteTask"
       :tasks="tasks"
     /> -->
-    <ButtonsControl :lights="lights" @toggle="toggle" />
+    <ButtonsControl :relays="relays" @toggle="toggle" />
   </div>
 </template>
 
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       socket: require("socket.io-client")("http://192.168.50.13:3000"),
+      relays: [],
       lights: [],
       tasks: [],
     };
@@ -58,8 +59,16 @@ export default {
       //   t.id === task.id ? { ...t, reminder: !task.reminder } : t;
       // });
     },
-    toggle(val) {
-      this.socket.emit("lightToggle", val);
+    toggle(buttonID) {
+      this.socket.emit("relayToggle", buttonID);
+    },
+    toggleOverhead(buttonID) {
+      console.log(buttonID);
+      console.log("emitting overheadLights from Client");
+      this.socket.emit(
+        "overheadLights",
+        this.lights.filter((el) => el.id === buttonID).state
+      );
     },
   },
   created() {
@@ -85,11 +94,20 @@ export default {
     ];
     this.socket.on("init", (data) => {
       this.response = data;
+      this.relays = data.relays;
       this.lights = data.lights;
+      console.log(this.relays);
       console.log(this.lights);
       //this.power_data = data.power_data;
     });
-    this.socket.on("lightToggle", (data) => {
+    this.socket.on("relayToggle", (data) => {
+      this.relays.forEach((el) => {
+        if (el.id == data.id) {
+          el.state = data.state;
+        }
+      });
+    });
+    this.socket.on("toggleOverhead", (data) => {
       this.lights.forEach((el) => {
         if (el.id == data.id) {
           el.state = data.state;

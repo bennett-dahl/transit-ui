@@ -1,7 +1,7 @@
 <template>
   <header>
     <h1>{{ title }}</h1>
-    <BasicButton text="UI" color="green" />
+    <BasicButton @toggleOverhead="toggleOverhead" text="UI" color="green" />
   </header>
 </template>
 
@@ -15,6 +15,11 @@ export default {
   },
   components: {
     BasicButton,
+  },
+  methods: {
+    toggleOverhead(data) {
+      this.$emit("toggleOverhead", data);
+    },
   },
 };
 </script>
