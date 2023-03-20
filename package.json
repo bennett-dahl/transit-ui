@@ -5,6 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "findProcess": "sudo lsof -i -P -n | grep 5000",
+    "kill": "kill -9 $(lsof -t -i:5000)",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

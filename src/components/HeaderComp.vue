@@ -1,12 +1,14 @@
 <template>
-  <header>
+  <nav>
     <h1>{{ title }}</h1>
-    <BasicButton @toggleOverhead="toggleOverhead" text="UI" color="green" />
-  </header>
+    <!-- <BasicButton @toggleOverhead="toggleOverhead" text="Lights" color="green" /> -->
+    <DarkModeToggle />
+  </nav>
 </template>
 
 <script>
-import BasicButton from "./BasicButton.vue";
+// import BasicButton from "./BasicButton.vue";
+import DarkModeToggle from "./DarkModeToggle.vue";
 
 export default {
   name: "HeaderComp",
@@ -14,7 +16,7 @@ export default {
     title: String,
   },
   components: {
-    BasicButton,
+    DarkModeToggle,
   },
   methods: {
     toggleOverhead(data) {
