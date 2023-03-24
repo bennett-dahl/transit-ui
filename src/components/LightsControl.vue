@@ -29,7 +29,15 @@ export default {
 };
 </script>
 
-<style></style>
-<!-- :text="light.name"
-          :id="light.id"
-          :checked="light.state" -->
+<style scoped>
+h1 {
+  text-align: center;
+}
+.light {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  /* padding: 5px 5px 5px 0px;
+  margin: 5px; */
+}
+</style>

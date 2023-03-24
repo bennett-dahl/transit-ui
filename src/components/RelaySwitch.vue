@@ -4,42 +4,33 @@
       <input
         type="checkbox"
         name="toggle-switch"
-        :id="light.id"
+        :id="relay.id"
         class="toggle-switch"
-        :checked="light.state"
+        :checked="relay.state"
         @click="onClick"
       />
       <label class="toggle-body" for="toggle"></label>
     </div>
-    <span class="toggle-label">{{ light.name }}</span>
+    <span class="toggle-label">{{ relay.name }}</span>
   </div>
-
-  <!-- <button @click="onClick()" :style="{ background: color }" class="btn">
-      {{ text }}
-    </button> -->
 </template>
 
 <script>
 export default {
-  name: "LightSwitch",
+  name: "RelaySwitch",
   props: {
-    light: {
+    relay: {
       type: Object,
       required: true,
     },
-    // text: String,
-    // id: Number,
-    // state: Boolean,
   },
   methods: {
     onClick() {
-      console.log(this.light);
-      this.$emit("toggleLightSwitch", {
-        state: !this.light.state,
-        id: this.light.id,
+      console.log(this.relay);
+      this.$emit("toggleRelaySwitch", {
+        state: !this.relay.state,
+        id: this.relay.id,
       });
-      //   console.log("Clicked LightSwitch");
-      //   console.log({ state: this.state, id: this.id });
     },
   },
 };

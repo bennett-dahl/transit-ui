@@ -2,72 +2,52 @@
   <div class="app">
     <HeaderComp @toggleOverhead="toggleOverhead" title="Transit Control" />
     <div class="home-container">
-      <!-- <TasksAll
-      @toggle-reminder="toggleReminder"
-      @delete-task="deleteTask"
-      :tasks="tasks"
-    /> -->
-      <ButtonsControl :relays="relays" @toggle="toggle" />
-      <LightsControl :lights="lights" @toggleLightSwitch="toggleLightSwitch" />
+      <!-- <ButtonsControl :relays="relays" @toggle="toggle" /> -->
+      <div class="controls">
+        <RelaysControl
+          :relays="relays"
+          @toggleRelaySwitch="toggleRelaySwitch"
+        />
+        <LightsControl
+          :lights="lights"
+          @toggleLightSwitch="toggleLightSwitch"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import HeaderComp from "./components/HeaderComp";
-//import TasksAll from "./components/TasksAll.vue";
 import "@fortawesome/fontawesome-free/js/all.js";
 import "bootstrap";
-import ButtonsControl from "./components/ButtonsControl.vue";
+//import ButtonsControl from "./components/ButtonsControl.vue";
 import LightsControl from "./components/LightsControl.vue";
+import RelaysControl from "./components/RelaysControl.vue";
 
 export default {
   name: "App",
   components: {
     HeaderComp,
-    ButtonsControl,
+    //ButtonsControl,
     LightsControl,
+    RelaysControl,
   },
   data() {
     return {
       socket: require("socket.io-client")("http://192.168.50.13:3000"),
       relays: [],
       lights: [],
-      tasks: [],
     };
   },
 
   methods: {
-    deleteTask(id) {
-      if (
-        confirm(
-          "Are you sure you'd like to delete task: " +
-            this.tasks.filter((task) => task.id == id)[0].text
-        )
-      ) {
-        this.tasks = this.tasks.filter((task) => task.id !== id);
-      }
-    },
-    toggleReminder(task) {
-      // console.log("app toggle reminder " + JSON.stringify(id));
-
-      console.log(this.tasks[task.id - 1]);
-
-      this.tasks[task.id - 1] = {
-        ...task,
-        reminder: this.tasks[task.id - 1] == true ? false : true,
-      };
-
-      console.log(this.tasks[task.id - 1]);
-      // this.task[task.id - 1] =
-      // this.tasks = this.tasks.map((t) => {
-      //   t.id === task.id ? { ...t, reminder: !task.reminder } : t;
-      // });
-    },
+    //these functions are for outgoing data to the server
     toggle(buttonID) {
       this.socket.emit("relayToggle", buttonID);
       console.log(buttonID);
     },
+    //this function toggles the overhead light by emitting the inverse of the ui state of the light
     toggleOverhead(buttonID) {
       console.log(buttonID);
       console.log("emitting overheadLights from Client");
@@ -80,39 +60,27 @@ export default {
       this.lights = this.lights.map((el) => {
         return el.id == data.id ? { ...el, state: data.state } : el;
       });
-      // console.log(this.lights);
       console.log("emitting lightToggle from Client");
       this.socket.emit("overheadLights", data);
     },
+    toggleRelaySwitch(data) {
+      this.relays = this.relays.map((el) => {
+        return el.id == data.id ? { ...el, state: data.state } : el;
+      });
+      console.log("emitting relayToggle from Client");
+      this.socket.emit("relayToggle", data);
+    },
   },
   created() {
-    this.tasks = [
-      {
-        id: 1,
-        text: "Doctors Appointment",
-        day: "March 1st",
-        reminder: true,
-      },
-      {
-        id: 2,
-        text: "Meeting",
-        day: "March 2nd",
-        reminder: true,
-      },
-      {
-        id: 3,
-        text: "Grocery Shopping",
-        day: "March 5th",
-        reminder: false,
-      },
-    ];
+    //these functions are for incoming data from the server
+
+    //this function initializes the ui state of the relays and lights
     this.socket.on("init", (data) => {
       this.response = data;
       this.relays = [...data.relays];
       this.lights = [...data.lights];
       console.log(this.relays);
       console.log(this.lights);
-      //this.power_data = data.power_data;
     });
     this.socket.on("relayToggle", (data) => {
       this.relays.forEach((el) => {
@@ -154,12 +122,12 @@ body {
   padding: 0;
 }
 .home-container {
-  display: flexbox;
-  flex-direction: fl;
+  display: flex;
+  flex: wrap;
   align-items: center;
   justify-content: space-between;
   margin: 0 auto;
-  width: 100%;
+  width: 90%;
   max-width: 800px;
   padding: 20px;
 }
@@ -172,6 +140,8 @@ body {
 
 .controls {
   display: flex;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .control-button {
@@ -194,75 +164,6 @@ body {
 .control-button:active {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transform: translateY(2px);
-}
-
-.toggle-wrapper {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 5px 5px 0px;
-  border: 2px solid var(--main-text-color);
-  border-radius: 5px;
-  transition: border-color 0.3s;
-}
-
-.toggle-switch {
-  position: relative;
-  display: flex;
-  width: 34px;
-  height: 60px;
-  vertical-align: middle;
-  margin-left: 10px;
-}
-
-.toggle-switch input {
-  display: none;
-}
-
-.toggle-switch label {
-  position: absolute;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-  background-color: var(--toggle-bg-color);
-  border-radius: 8px;
-  transition: background-color 0.3s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-right: 10px;
-}
-
-.toggle-switch label::before {
-  position: absolute;
-  content: "";
-  width: 24px;
-  height: 24px;
-  background-color: var(--toggle-switch-color);
-  border-radius: 25%;
-  left: 3px;
-  top: 28px;
-  transition: top 0.3s, background-color 0.3s;
-  border: 2px solid #222222; /* Add border to the inside sliding part */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add drop-shadow to the inside sliding part */
-}
-
-.toggle-switch input:checked + label::before {
-  top: 4px;
-  background-color: var(
-    --indicator-light-on
-  ); /* Change the color of the sliding part */
-}
-
-.toggle-label {
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 10px;
-  line-height: 60px;
-  vertical-align: middle;
-  color: var(--main-text-color);
-  transition: color 0.3s;
-}
-
-#toggle_checkbox {
-  display: none;
 }
 
 nav {
@@ -298,7 +199,7 @@ nav .title {
   left: 10;
   width: 116px;
   height: 56px;
-  margin: 0 auto;
+  margin: 8px auto;
   background-color: #77b5fe;
   border-radius: 56px;
   transform: translateY(-50%);
@@ -402,6 +303,66 @@ body.dark-mode .toggle-label {
 
 body.dark-mode .toggle-wrapper {
   border-color: var(--main-text-color);
+}
+
+/* ... Your existing CSS styles ... */
+
+@media (max-width: 600px) {
+  /* Styles for mobile devices */
+
+  .controls {
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .control-button {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+
+  .theme-toggle {
+    margin: 25px 5px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  /* Styles for tablet devices */
+
+  .theme-toggle {
+    margin: 25px 5px;
+  }
+
+  nav .title {
+    font-size: 1.8em;
+    margin: 12px;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Styles for desktop devices */
+
+  /* .control-button {
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+
+  .toggle-wrapper {
+    padding: 5px 5px 5px 0px;
+  }
+
+  .toggle-label {
+    font-size: 14px;
+    line-height: 60px;
+  } */
+
+  .theme-toggle {
+    margin: 33px 12px;
+  }
+
+  nav .title {
+    font-size: 2em;
+    margin: 15px;
+  }
 }
 
 /* * {
